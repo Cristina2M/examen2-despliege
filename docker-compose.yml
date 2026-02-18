@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  web:
+    build: ./web
+    ports:
+      - "80:80"     # Puerto estándar HTTP (para la redirección)
+      - "443:443"   # Puerto estándar HTTPS (Tu web segura)
+    volumes:
+      - ./app:/var/www/html:z
+      # Montamos la configuración de Nginx
+      - ./web/default.conf:/etc/nginx/conf.d/default.conf
+      # Montamos la carpeta de certificados
+      - ./web/certs:/etc/nginx/certs
+    depends_on:
+      - php
+    user: root
+
+  php:
+    build: ./php
+    volumes:
+      - ./app:/var/www/html:z
