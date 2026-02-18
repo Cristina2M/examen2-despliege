@@ -1,8 +1,8 @@
 # examen2-despliege
+URL: https://cristina2daw.es/
 
-
-🚀 GUÍA DE DESPLIEGUE: EC2 + EFS + GITHUB ACTIONS
-🏗️ FASE 1: El Almacenamiento (AWS EFS)
+# 🚀 GUÍA DE DESPLIEGUE: EC2 + EFS + GITHUB ACTIONS
+# 🏗️ FASE 1: El Almacenamiento (AWS EFS)
 Esta es la base. Sin el disco compartido, los datos no persisten.
 Paso 1: Ir a EFS ➔ Create file system.
 Paso 2: Configuración rápida:
@@ -12,7 +12,7 @@ Disponibilidad: Regional (Importante).
 Paso 3: Clic en Create.
 📋 NOTA DE ORO: Copia el File System ID que aparece (ej. fs-0123abcd). Lo usarás en el paso 3.
 
-🔐 FASE 2: El Escudo de Seguridad (Security Groups)
+# 🔐 FASE 2: El Escudo de Seguridad (Security Groups)
 Configura quién habla con quién. Si esto falla, nada conecta.
 🛡️ SG Instancia (EC2)
 Protocolo
@@ -39,7 +39,7 @@ Solo si es necesario
 🛡️ SG Almacenamiento (EFS)
 Regla de Entrada: Tipo NFS ➔ Puerto 2049 ➔ Origen: SG de la EC2.
 
-⚡ FASE 3: Lanzamiento con Auto-Configuración
+# ⚡ FASE 3: Lanzamiento con Auto-Configuración
 Crea la EC2 y olvídate. Ella se preparará sola con este script.
 En el apartado Advanced Details ➔ User Data, pega esto (sustituyendo tu ID):
 Bash
@@ -247,7 +247,7 @@ commit para arriba, y prueba https://tupaginaweb.es
 
 
 en caso de errores puedes mirar:
-ssh -i "Prep-Examen-Key.pem" ubuntu@3.225.14.125
+ssh -i "Prep-Examen-Key.pem" ubuntu@TU_IP
 
 cd ~/app
 
