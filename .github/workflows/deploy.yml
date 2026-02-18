@@ -1,0 +1,68 @@
+name: Deploy PHP App to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: 1. Copiar archivos a la EC2 (SCP)
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          source: "."
+          target: "~/app"
+
+      - name: 2. Ejecutar comandos vía SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            set -e
+            
+            echo "🐳 Comprobando Docker (Ubuntu Mode)"
+            # Si Docker no existe, actualizamos repositorios e instalamos
+            if ! command -v docker &> /dev/null; then
+              sudo apt-get update
+              sudo apt-get install -y docker.io
+              sudo systemctl start docker
+              sudo systemctl enable docker
+            fi
+
+            echo "🧩 Comprobando Docker Compose"
+            # Instalación manual de Docker Compose v2
+            if ! command -v docker-compose &> /dev/null; then
+              sudo curl -L "https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+
+            echo "📂 Gestionando archivos y NFS"
+            # Creamos la carpeta EFS si no existe (asegúrate de que tu disco esté montado aquí si usas AWS EFS real)
+            sudo mkdir -p /efs/app
+            
+            # Copiamos el código nuevo. '|| true' evita errores si la carpeta está vacía al principio
+            if [ -d "~/app/app" ]; then
+                sudo cp -r ~/app/app/* /efs/app/
+            else
+                # Si tu código está en la raíz del repo
+                sudo cp -r ~/app/* /efs/app/
+            fi
+
+            echo "🚀 Reiniciando contenedores"
+            cd ~/app
+            
+            # Bajamos los contenedores antiguos (si existen)
+            sudo docker-compose down || true
+            
+            # Levantamos los nuevos forzando la reconstrucción
+            sudo docker-compose up --build -d
