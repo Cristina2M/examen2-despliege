@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Mi primera app PHP</title>
+    <title>APP básica examen</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 
